@@ -8,7 +8,7 @@
                 margin: 0;
                 padding: 0;
                 font-family: 'DM Sans', sans-serif;
-                font-size: 2vh;
+                font-size: 1.5vh;
             }
 
             a {
@@ -53,7 +53,10 @@
                 width: 100%;
                 height: 100%;
                 position: fixed;
-                background: url(loading.gif) no-repeat center center white;
+                background: url(loading.gif) white;
+                background-repeat: no-repeat;
+                background-size: 100px 100px;
+                background-position: 50% calc(50% - 5vh);
             }
         </style>
     </head>
@@ -243,21 +246,23 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
 
                 try {
                     let distance = await distanceTo(randomLocation.coordinates);
+
                     if (!selectedLocations.map(loc => loc.name).includes(randomLocation.name) && distance >= 1) {
                         randomLocation.points = points(randomLocation.basePoints, distance);
                         selectedLocations.push(randomLocation);
                     }
                 }
+                
                 catch (error) {
                     console.error(error);
                 }
             }
-            
+
             localStorage.savedLocations = JSON.stringify(selectedLocations);
-            
+
             setTimeout(() => {
                 updateCards(selectedLocations);
-            }, 0);
+            }, 50);
         }
 
         function updateCards(locations) {
@@ -289,7 +294,7 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                     }
                     else {
                         clearInterval(fadeOutInterval);
-                        loading.remove();
+                        loading.style.display = "none";
                     }
                 }, 50);
             }
