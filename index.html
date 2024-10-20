@@ -4,13 +4,11 @@
         <title>Tag Through Toronto</title>
         <link href="https://fonts.cdnfonts.com/css/dm-sans" rel="stylesheet">
         <style>
-            @import url('https://fonts.cdnfonts.com/css/dm-sans');
-
             body {
                 margin: 0;
                 padding: 0;
-                font-size: 1.5vh;
                 font-family: 'DM Sans', sans-serif;
+                font-size: 2vh;
             }
 
             a {
@@ -23,19 +21,15 @@
             }
 
             #cards {
-                margin-top: 5vh;
-                margin-bottom: 2.5vh;
-                margin-left: 10vw;
-                margin-right: 10vw;
+                margin: 5vh 10vw 2.5vh;
             }
 
             .card {
                 width: calc(80vw - 44px);
                 margin-bottom: 2.5vh;
                 padding: 20px;
-                border-radius: 20px;
                 border: 2px solid rgb(218, 37, 29);
-                overflow-x: wrap;
+                border-radius: 20px;
                 overflow-y: scroll;
             }
 
@@ -43,11 +37,11 @@
                 width: calc(80vw - 34px);
                 margin-left: 10vw;
                 padding: 15px;
-                border-radius: 10px;
                 background-color: rgb(218, 37, 29);
                 border: 2px solid rgb(218, 37, 29);
+                border-radius: 10px;
                 color: white;
-                font-weight: 900;
+                font-weight: bold;
                 text-align: center;
                 cursor: pointer;
             }
@@ -59,12 +53,12 @@
             <div id="card2" class="card"></div>
             <div id="card3" class="card"></div>
         </div>
-        <div id="button" onclick="generate()">
+        <div id="button" onclick="generateLocations()">
             <h3>Generate Locations</h3>
         </div>
     </body>
     <script>
-        let data = `Attractions	Aga Khan Museum	77 Wynford Dr	43.725301599999995, -79.3319921102314	5
+        let rawData = `Attractions	Aga Khan Museum	77 Wynford Dr	43.725301599999995, -79.3319921102314	5
 Libraries	Agincourt Library	155 Bonis Ave	43.785267000000005, -79.29344776239067	5
 Libraries	Albert Campbell Library	496 Birchmount Rd	43.7080605, -79.26929902050875	4
 Libraries	Albion Library	1515 Albion Rd	43.7398714, -79.58480986358508	4
@@ -203,74 +197,69 @@ Libraries	York Woods Library	1785 Finch Ave W	43.7588675, -79.50732581137106	5
 Malls	Yorkdale Mall	3401 Dufferin St	43.7256238, -79.45230789320112	3
 Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.split("\n");
 
-        let libraries = [];
-        let malls = [];
-        let schools = [];
-        let attractions = [];
+        let categories = {
+            Libraries: [],
+            Malls: [],
+            Schools: [],
+            Attractions: []
+        };
         
-        for (let i = 0; i < data.length; i++) {
-            let location_string = data[i].split("\t");
-            let type = location_string[0];
-            let location = {
-                name: location_string[1],
-                address: location_string[2],
-                coordinates: location_string[3],
-                base_points: location_string[4],
-            }
-
-            if (type == "Libraries") {
-                libraries.push(location);
-            }
-            else if (type == "Malls") {
-                malls.push(location);
-            }
-            else if (type == "Schools") {
-                schools.push(location);
-            }
-            else {
-                attractions.push(location);
-            }
+        for (let i = 0; i < rawData.length; i++) {
+            let [type, name, address, coordinates, basePoints] = rawData[i].split("\t");
+            categories[type].push({
+                name: name,
+                address: address,
+                coordinates: coordinates,
+                base_points: basePoints
+            });
         }
 
-        document.body.onload = function() {
-            if (localStorage.generated_locations != null) {
-                update_cards(JSON.parse(localStorage.generated_locations));
+        window.onload = function() {
+            if (localStorage.savedLocations != null) {
+                updateCards(JSON.parse(localStorage.savedLocations));
             }
         };
 
-        function generate() {
-            // todo: generate
-            let possible_arrays = [libraries, malls, schools, attractions, attractions, attractions];
-            let generated_locations = [];
+        function generateLocations() {
+            let allCategories = [categories.Libraries, categories.Malls, categories.Schools, categories.Attractions];
+            let selectedLocations = [];
 
-            for (let i = 0; i <= 2; i++) {
-                let array = possible_arrays[Math.floor(Math.random() * possible_arrays.length)];
-                let generated_location = array[Math.floor(Math.random() * array.length)];
+            while (selectedLocations.length < 3) {
+                let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
+                let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
 
-                while (generated_locations.map((x) => x.name).includes(generated_location.name) || distance_to(generated_location.coordinates) <= 1) {
-                    array = possible_arrays[Math.floor(Math.random() * possible_arrays.length)];
-                    generated_location = array[Math.floor(Math.random() * array.length)];
+                while (generated_locations.map(loc => loc.name).includes(randomLocation.name) || distanceTo(randomLocation.coordinates) < 1) {
+                    randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
+                    randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
                 }
 
-                generated_location.points = points(generated_location.base_points, generated_location.coordinates);
-                generated_locations.push(generated_location);
+                randomLocation.points = points(randomLocation.basePoints, randomLocation.coordinates);
+                
+                selectedLocations.push(randomLocation);
             }
             
-            localStorage.generated_locations = JSON.stringify(generated_locations);
-            update_cards(generated_locations);
+            localStorage.savedLocations = JSON.stringify(selectedLocations);
+            update_cards(selectedLocations);
         }
 
-        function update_cards(generated_locations) {
-            for (let i = 1; i <= 3; i++) {
-                let generated_location = generated_locations[i - 1];
-                document.getElementById("card" + i).innerHTML = `<h1>${generated_location.name}</h1><a target="_blank" href="https://www.google.com/maps/dir//${generated_location.coordinates.replace(' ', '%20')}"><b>${generated_location.address}</b></a><p>${generated_location.points} points</p>`;
+        function updateCards(locations) {
+            for (let i = 1; i <= locations.length; i++) {
+                let location = locations[i - 1];
+                document.getElementById(`card${i}`).innerHTML = `<h1>${location.name}</h1>
+<p>
+    <a target="_blank" href="https://www.google.com/maps/dir//${location.coordinates.replace(' ', '%20')}">
+        <b>${location.address}</b>
+    </a>
+    (${distanceTo(location.coordinates).toFixed(2)} km away)
+</p>
+<p>${generated_location.points} points</p>`;
             }
         }
+            
+        function points(basePoints, coordinates) {
+            var distance = distanceTo(coordinates);
 
-        function points(base_points, coordinates) {
-            var distance = distance_to(coordinates);
-
-            if (distance == 0) {
+            if (distance == -1) {
                 return 0;
             }
             else if (distance <= 3) {
@@ -287,13 +276,13 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             }
         }
 
-        function distance_to(coordinates) {
+        function distanceTo(coordinates) {
             if (navigator.geolocation) {
                 let [lat1, lon1] = coordinates.split(", ").map(Number);
                 
                 navigator.geolocation.getCurrentPosition(position => {
-                    lat2 = position.coords.latitude;
-                    lon2 = position.coords.longitude;
+                    let lat2 = position.coords.latitude;
+                    let lon2 = position.coords.longitude;
 
                     let toRad = deg => deg * Math.PI / 180;
                     let R = 6371;
@@ -309,7 +298,7 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                 });
             }
             else {
-                return 0;
+                return -1;
             }
         }
     </script>
