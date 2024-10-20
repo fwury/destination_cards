@@ -227,59 +227,58 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             });
         }
 
-        window.onload = function() {
-            if (localStorage.savedLocations != null) {
-                updateCards(JSON.parse(localStorage.savedLocations));
+        window.onload = () => {
+            if (localStorage.savedLocations === null) {
+                removeLoading();
             }
             else {
-                removeLoading();
+                updateCards(JSON.parse(localStorage.savedLocations));
             }
         };
 
-        async function generateLocations() {
+        function generateLocations() {
             let allCategories = [categories.Libraries, categories.Malls, categories.Schools, categories.Attractions];
             let selectedLocations = [];
+            
+            navigator.geolocation.getCurrentPosition(position => {
+                let lat1 = position.coords.latitude;
+                let lon1 = position.coords.longitude;
 
-            while (selectedLocations.length < 3) {
-                let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
-                let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
-
-                try {
-                    let distance = await distanceTo(randomLocation.coordinates);
-
-                    if (!selectedLocations.map(loc => loc.name).includes(randomLocation.name) && distance >= 1) {
+                while (selectedLocations.length < 3) {
+                    let selectedLocationsNames = selectedLocations.map(loc => loc.name);
+                    let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
+                    let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
+    
+                    let lat2 = randomLocation.coordinates.split(" ")[0];
+                    let lon2 = randomLocation.coordinates.split(" ")[1];
+                    let distance = distanceBetween(lat1, lon1, lat2, lon2);
+                    
+                    if (!selectedLocationsNames.includes(randomLocation.name) && distance >= 1) {
                         randomLocation.points = points(randomLocation.basePoints, distance);
                         selectedLocations.push(randomLocation);
                     }
                 }
-                
-                catch (error) {
-                    console.error(error);
-                }
-            }
-
-            localStorage.savedLocations = JSON.stringify(selectedLocations);
-
-            setTimeout(() => {
-                updateCards(selectedLocations);
-            }, 50);
+    
+                localStorage.savedLocations = JSON.stringify(selectedLocations);
+    
+                setTimeout(() => {
+                    updateCards(selectedLocations);
+                }, 0);
+            });
         }
 
         function updateCards(locations) {
-            let promises = [];
-
-            for (let i = 0; i < locations.length; i++) {
-                let location = locations[i];
-                let promise = distanceTo(location.coordinates).then(distance => {
+            navigator.geolocation.getCurrentPosition(position => {
+                let lat1 = position.coords.latitude;
+                let lon1 = position.coords.longitude;
+                
+                for (let i = 0; i < locations.length; i++) {
+                    let location = locations[i];
+                    let [lat2, lon2] = location.coordinates.split(", ").map(Number);
+                    let distance = distanceBetween(lat1, lon1, lat2, lon2);
+                    
                     document.getElementById(`card${i + 1}`).innerHTML = `<h1>${location.name}</h1><p><a target="blank" href="https://www.google.com/maps/dir//${location.address},%20Toronto"><b>${location.address}</b></a> - ${distance.toFixed(2)} km away</p><p>${location.points} points</p>`;
-                }).catch(error => {
-                    console.error(error);
-                });
-                promises.push(promise);
-            }
-
-            Promise.all(promises).then(removeLoading).catch(error => {
-                console.error(error);
+                }
             });
         }
 
@@ -315,27 +314,14 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             }
         }
 
-        async function distanceTo(coordinates) {
-            let [lat1, lon1] = coordinates.split(", ").map(Number);
-            
-            return new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(position => {
-                    let lat2 = position.coords.latitude;
-                    let lon2 = position.coords.longitude;
-        
-                    let toRad = deg => deg * Math.PI / 180;
-                    let R = 6371; // Radius of the Earth in km
-                    let dLat = toRad(lat2 - lat1);
-                    let dLon = toRad(lon2 - lon1);
-                    let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                    let distance = R * c;
-        
-                    resolve(distance);
-                }, reject);
-            });
+        function distanceBetween(lat1, lon1, lat2, lon2) {
+            let toRad = deg => deg * Math.PI / 180;
+            let R = 6371;
+            let dLat = toRad(lat2 - lat1);
+            let dLon = toRad(lon2 - lon1);
+            let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
         }
     </script>
 </html>
