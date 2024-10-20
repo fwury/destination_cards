@@ -232,6 +232,8 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                         randomLocation.points = points(randomLocation.basePoints, distance);
                         selectedLocations.push(randomLocation);
                     };
+                }).catch(error => {
+                    alert("Error: " + error);
                 });
             }
             
@@ -249,6 +251,8 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
     - ${distance.toFixed(2)} km away
 </p>
 <p>${location.points} points</p>`;
+                }).catch(error => {
+                    alert("Error: " + error);
                 });
             }
         }
@@ -271,21 +275,23 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
         async function distanceTo(coordinates) {
             let [lat1, lon1] = coordinates.split(", ").map(Number);
             
-            navigator.geolocation.getCurrentPosition(position => {
-                let lat2 = position.coords.latitude;
-                let lon2 = position.coords.longitude;
-
-                let toRad = deg => deg * Math.PI / 180;
-                let R = 6371;
-                let dLat = toRad(lat2 - lat1);
-                let dLon = toRad(lon2 - lon1);
-                let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                    Math.sin(dLon/2) * Math.sin(dLon/2);
-                let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                let distance = R * c;
-
-                return distance;
+            return new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(position => {
+                    let lat2 = position.coords.latitude;
+                    let lon2 = position.coords.longitude;
+        
+                    let toRad = deg => deg * Math.PI / 180;
+                    let R = 6371; // Radius of the Earth in km
+                    let dLat = toRad(lat2 - lat1);
+                    let dLon = toRad(lon2 - lon1);
+                    let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                    let distance = R * c;
+        
+                    resolve(distance); // Resolve the promise with the calculated distance
+                }, reject); // Optionally handle errors by rejecting the promise
             });
         }
     </script>
