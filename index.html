@@ -220,24 +220,19 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             }
         };
 
-        async function generateLocations() {
+        function generateLocations() {
             let allCategories = [categories.Libraries, categories.Malls, categories.Schools, categories.Attractions];
             let selectedLocations = [];
 
             while (selectedLocations.length < 3) {
                 let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
                 let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
-                let distance = await distanceTo(randomLocation.coordinates);
-
-                while (selectedLocations.map(loc => loc.name).includes(randomLocation.name) || distance < 1) {
-                    randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
-                    randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
-                    distance = await distanceTo(randomLocation.coordinates);
-                };
-
-                randomLocation.points = points(randomLocation.basePoints, randomLocation.coordinates);
-                
-                selectedLocations.push(randomLocation);
+                distanceTo(randomLocation.coordinates).then(distance => {
+                    if (!selectedLocations.map(loc => loc.name).includes(randomLocation.name) && distance >= 1) {
+                        randomLocation.points = points(randomLocation.basePoints, distance);
+                        selectedLocations.push(randomLocation);
+                    };
+                });
             }
             
             localStorage.savedLocations = JSON.stringify(selectedLocations);
@@ -247,22 +242,19 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
         function updateCards(locations) {
             for (let i = 0; i < locations.length; i++) {
                 let location = locations[i];
-                document.getElementById(`card${i + 1}`).innerHTML = `<h1>${location.name}</h1>
+                distanceTo(location.coordinates).toFixed(2).then(distance => {
+                    document.getElementById(`card${i + 1}`).innerHTML = `<h1>${location.name}</h1>
 <p>
     <a target="blank" href="https://www.google.com/maps/dir//${location.coordinates.replace(' ', '%20')}"><b>${location.address}</b></a>
-    - ${distanceTo(location.coordinates)} km away
+    - ${distance.toFixed(2)} km away
 </p>
 <p>${location.points} points</p>`;
+                });
             }
         }
             
-        async function points(basePoints, coordinates) {
-            let distance = await distanceTo(coordinates);
-
-            if (distance == -1) {
-                return 0;
-            }
-            else if (distance <= 3) {
+        function points(basePoints, distance) {
+            if (distance <= 3) {
                 return Number(basePoints);
             }
             else if (distance <= 6) {
@@ -276,34 +268,25 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             }
         }
 
-        function distanceTo(coordinates) {
-            return new Promise((resolve, reject) => {
-                if (navigator.geolocation) {
-                    let [lat1, lon1] = coordinates.split(", ").map(Number);
-                    
-                    navigator.geolocation.getCurrentPosition(position => {
-                        let lat2 = position.coords.latitude;
-                        let lon2 = position.coords.longitude;
-        
-                        let toRad = deg => deg * Math.PI / 180;
-                        let R = 6371;
-                        let dLat = toRad(lat2 - lat1);
-                        let dLon = toRad(lon2 - lon1);
-                        let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-                            Math.sin(dLon/2) * Math.sin(dLon/2);
-                        let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                        let distance = R * c;
-        
-                        resolve(distance);
-                    }, error => {
-                        reject(error);
-                    });
-                }
-                else {
-                    reject(new Error("Geolocation is not supported by this browser."));
-                }
-            });
+        async function distanceTo(coordinates) {
+            let [lat1, lon1] = coordinates.split(", ").map(Number);
+            
+            navigator.geolocation.getCurrentPosition(position => {
+                let lat2 = position.coords.latitude;
+                let lon2 = position.coords.longitude;
+
+                let toRad = deg => deg * Math.PI / 180;
+                let R = 6371;
+                let dLat = toRad(lat2 - lat1);
+                let dLon = toRad(lon2 - lon1);
+                let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+                let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                let distance = R * c;
+
+                return distance;
+            }
         }
     </script>
 </html>
