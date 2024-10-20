@@ -152,7 +152,6 @@ Libraries	Pape/Danforth Library	701 Pape Ave	43.6785829, -79.3445514	3
 Libraries	Parkdale Library	1303 Queen St W	43.64115565, -79.43263403441716	3
 Malls	Parkway Mall	85 Ellesmere Rd	43.7570385, -79.3120820920344	6
 Libraries	Parliament Street Library	269 Gerrard St E	43.66182775, -79.36794333333333	3
-Attractions	Pearson Airport	6301 Silver Dart Dr	43.68238570796763, -79.612549738938	5
 Libraries	Perth/Dupont Library	1589 Dupont St	43.665038499999994, -79.45382384869933	3
 Libraries	Pleasant View Library	575 Van Horne Ave	43.787539499999994, -79.33545137732528	5
 Attractions	Port Lands	312 Cherry St	43.64690167139649, -79.35539065414348	4
@@ -241,7 +240,10 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             }
             
             localStorage.savedLocations = JSON.stringify(selectedLocations);
-            updateCards(selectedLocations);
+            
+            setTimeout(() => {
+                updateCards(selectedLocations)
+            }, 0);
         }
 
         function updateCards(locations) {
@@ -250,7 +252,7 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                 distanceTo(location.coordinates).then(distance => {
                     document.getElementById(`card${i + 1}`).innerHTML = `<h1>${location.name}</h1>
 <p>
-    <a target="blank" href="https://www.google.com/maps/dir//${location.coordinates.replace(' ', '%20')}"><b>${location.address}</b></a>
+    <a target="blank" href="https://www.google.com/maps/dir//${location.address},%20${Toronto}"><b>${location.address}</b></a>
     - ${distance.toFixed(2)} km away
 </p>
 <p>${location.points} points</p>`;
