@@ -275,7 +275,9 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
         }
 
         function distanceTo(coordinates) {
+            console.log("c") //
             if (navigator.geolocation) {
+                console.log("a") //
                 let [lat1, lon1] = coordinates.split(", ").map(Number);
                 
                 navigator.geolocation.getCurrentPosition(position => {
@@ -296,7 +298,8 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                 });
             }
             else {
-                return -1;
+                console.log("b") //
+                return 0;
             }
         }
     </script>
