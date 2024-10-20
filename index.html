@@ -210,7 +210,7 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                 name: locationInfo[1],
                 address: locationInfo[2],
                 coordinates: locationInfo[3],
-                basepoints: locationInfo[4]
+                basePoints: locationInfo[4]
             });
         }
 
@@ -220,21 +220,24 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             }
         };
 
-        function generateLocations() {
+        async function generateLocations() {
             let allCategories = [categories.Libraries, categories.Malls, categories.Schools, categories.Attractions];
             let selectedLocations = [];
 
             while (selectedLocations.length < 3) {
                 let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
                 let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
-                distanceTo(randomLocation.coordinates).then(distance => {
+
+                try {
+                    let distance = await distanceTo(randomLocation.coordinates);
                     if (!selectedLocations.map(loc => loc.name).includes(randomLocation.name) && distance >= 1) {
                         randomLocation.points = points(randomLocation.basePoints, distance);
                         selectedLocations.push(randomLocation);
                     }
-                }).catch(error => {
+                }
+                catch (error => {
                     console.error(error);
-                });
+                }
             }
             
             localStorage.savedLocations = JSON.stringify(selectedLocations);
@@ -256,9 +259,8 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                 });
             }
         }
-            
+        
         function points(basePoints, distance) {
-            console.log("Distance: ", distance);
             if (distance <= 3) {
                 return Number(basePoints);
             }
@@ -291,8 +293,8 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                     let distance = R * c;
         
-                    resolve(distance); // Resolve the promise with the calculated distance
-                }, reject); // Optionally handle errors by rejecting the promise
+                    resolve(distance);
+                }, reject);
             });
         }
     </script>
