@@ -214,8 +214,6 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             });
         }
 
-        console.log(categories.Schools);
-
         window.onload = function() {
             if (localStorage.savedLocations != null) {
                 updateCards(JSON.parse(localStorage.savedLocations));
@@ -245,9 +243,9 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
         }
 
         function updateCards(locations) {
-            for (let i = 1; i <= locations.length; i++) {
-                let location = locations[i - 1];
-                document.getElementById(`card${i}`).innerHTML = `<h1>${location.name}</h1>
+            for (let i = 0; i < locations.length; i++) {
+                let location = locations[i];
+                document.getElementById(`card${i + 1}`).innerHTML = `<h1>${location.name}</h1>
 <p>
     <a target="blank" href="https://www.google.com/maps/dir//${location.coordinates.replace(' ', '%20')}">
         <b>${location.address}</b>
