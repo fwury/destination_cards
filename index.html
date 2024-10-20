@@ -209,7 +209,7 @@ Schools	York University (Glendon Campus)	2275 Bayview Ave	43.7301697, -79.381272
 Libraries	York Woods Library	1785 Finch Ave W	43.7588675, -79.50732581137106	5
 Malls	Yorkdale Mall	3401 Dufferin St	43.7256238, -79.45230789320112	3
 Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.split("\n");
-
+        
         let categories = {
             Libraries: [],
             Malls: [],
@@ -226,9 +226,9 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                 basePoints: locationInfo[4]
             });
         }
-
+        
         window.onload = () => {
-            if (localStorage.savedLocations === null) {
+            if (localStorage.savedLocations == null) {
                 removeLoading();
             }
             else {
@@ -236,21 +236,30 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
             }
         };
 
+        function addLoading() {
+            let loading = document.getElementById("loading");
+            loading.style.display = "block";
+        }
+
+        function removeLoading() {
+            let loading = document.getElementById("loading");
+            loading.style.display = "none";
+        }
+
         function generateLocations() {
+            addLoading();
             let allCategories = [categories.Libraries, categories.Malls, categories.Schools, categories.Attractions];
             let selectedLocations = [];
-            
+
             navigator.geolocation.getCurrentPosition(position => {
                 let lat1 = position.coords.latitude;
                 let lon1 = position.coords.longitude;
-
+                
                 while (selectedLocations.length < 3) {
                     let selectedLocationsNames = selectedLocations.map(loc => loc.name);
                     let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
                     let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
-    
-                    let lat2 = randomLocation.coordinates.split(" ")[0];
-                    let lon2 = randomLocation.coordinates.split(" ")[1];
+                    let [lat2, lon2] = randomLocation.coordinates.split(", ").map(Number);
                     let distance = distanceBetween(lat1, lon1, lat2, lon2);
                     
                     if (!selectedLocationsNames.includes(randomLocation.name) && distance >= 1) {
@@ -260,10 +269,11 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                 }
     
                 localStorage.savedLocations = JSON.stringify(selectedLocations);
-    
-                setTimeout(() => {
-                    updateCards(selectedLocations);
-                }, 0);
+                updateCards(selectedLocations);
+            }, error => {
+                if (error.code == error.PERMISSION_DENIED) {
+                    alert("Please enable geolocation.");
+                }
             });
         }
 
@@ -276,44 +286,19 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                     let location = locations[i];
                     let [lat2, lon2] = location.coordinates.split(", ").map(Number);
                     let distance = distanceBetween(lat1, lon1, lat2, lon2);
-                    
                     document.getElementById(`card${i + 1}`).innerHTML = `<h1>${location.name}</h1><p><a target="blank" href="https://www.google.com/maps/dir//${location.address},%20Toronto"><b>${location.address}</b></a> - ${distance.toFixed(2)} km away</p><p>${location.points} points</p>`;
                 }
 
                 removeLoading();
+            }, error => {
+                if (error.code == error.PERMISSION_DENIED) {
+                    alert("Please enable geolocation.");
+                } 
             });
-        }
-
-        function removeLoading() {
-            let loading = document.getElementById("loading");
-            if (loading) {
-                let opacity = 1;
-                let fadeOutInterval = setInterval(() => {
-                    if (opacity > 0) {
-                        opacity -= 0.1;
-                        loading.style.opacity = opacity;
-                    }
-                    else {
-                        clearInterval(fadeOutInterval);
-                        loading.style.display = "none";
-                    }
-                }, 50);
-            }
         }
         
         function points(basePoints, distance) {
-            if (distance <= 3) {
-                return Number(basePoints);
-            }
-            else if (distance <= 6) {
-                return Number(basePoints) + 1;
-            }
-            else if (distance <= 9) {
-                return Number(basePoints) + 2;
-            }
-            else {
-                return Number(basePoints) + 3;
-            }
+            return Number(basePoints) + (Math.floor(distance) - 3);
         }
 
         function distanceBetween(lat1, lon1, lat2, lon2) {
