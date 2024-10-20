@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tag Through Toronto</title>
+        <link href="https://fonts.cdnfonts.com/css/dm-sans" rel="stylesheet">
+        <style>
+            @import url('https://fonts.cdnfonts.com/css/dm-sans');
+
+            body {
+                margin: 0;
+                padding: 0;
+                font-size: 1.5vh;
+                font-family: 'DM Sans', sans-serif;
+            }
+
+            a {
+                color: rgb(218, 37, 29);
+            }
+
+            h1, h2, h3, h4, h5, h6, p {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+
+            #cards {
+                margin-top: 5vh;
+                margin-bottom: 2.5vh;
+                margin-left: 10vw;
+                margin-right: 10vw;
+            }
+
+            .card {
+                width: calc(80vw - 44px);
+                margin-bottom: 2.5vh;
+                padding: 20px;
+                border-radius: 20px;
+                border: 2px solid rgb(218, 37, 29);
+                overflow-x: wrap;
+                overflow-y: scroll;
+            }
+
+            #button {
+                width: calc(80vw - 34px);
+                margin-left: 10vw;
+                padding: 15px;
+                border-radius: 10px;
+                background-color: rgb(218, 37, 29);
+                border: 2px solid rgb(218, 37, 29);
+                color: white;
+                font-weight: 900;
+                text-align: center;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="cards">
+            <div id="card1" class="card"></div>
+            <div id="card2" class="card"></div>
+            <div id="card3" class="card"></div>
+        </div>
+        <div id="button" onclick="generate()">
+            <h3>Generate Locations</h3>
+        </div>
+    </body>
+    <script>
+        let data = `Attractions	Aga Khan Museum	77 Wynford Dr	43.725301599999995, -79.3319921102314	5
+Libraries	Agincourt Library	155 Bonis Ave	43.785267000000005, -79.29344776239067	5
+Libraries	Albert Campbell Library	496 Birchmount Rd	43.7080605, -79.26929902050875	4
+Libraries	Albion Library	1515 Albion Rd	43.7398714, -79.58480986358508	4
+Malls	Albion Mall	1530 Albion Rd	43.7416654, -79.58454336862486	4
+Libraries	Alderwood Library	2 Orianna Dr	43.601598, -79.5473673	6
+Libraries	Amesbury Park Library	1565 Lawrence Ave W	43.7064334, -79.4857862350641	5
+Libraries	Annette Street Library	145 Annette St	43.6632845, -79.46637184707161	4
+Libraries	Armour Heights Library	2140 Avenue Rd	43.7392676, -79.4217072	6
+Attractions	Art Gallery of Ontario	317 Dundas St W	43.6536128, -79.39278002828382	6
+Libraries	Barbara Frum Library	20 Covington Rd	43.720779, -79.43218309273351	4
+Malls	Bayview Village	2901 Bayview Ave	43.769127850000004, -79.38518606927906	5
+Libraries	Beaches Library	2161 Queen St E	43.670078399999994, -79.2985123500471	5
+Libraries	Bendale Library	1515 Danforth Rd	43.751114, -79.24402904651163	6
+Attractions	Black Creek Pioneer Village	1000 Murray Ross Pkwy	43.7749816, -79.51888207794511	3
+Libraries	Bloor/Gladstone Library	1101 Bloor St W	43.659906500000005, -79.43412495676915	3
+Libraries	Brentwood Library	36 Brentwood Rd N	43.647365949999994, -79.51427036565227	4
+Malls	Bridlewood Mall	2900 Warden Ave	43.7993039, -79.3172414	5
+Libraries	Brookbanks Library	210 Brookbanks Dr	43.7595475, -79.32588852926685	6
+Libraries	Burrows Hall Library	1081 Progress Ave	43.794133, -79.2343514	5
+Libraries	Cedarbrae Library	545 Markham Rd	43.7575385, -79.22396215676275	6
+Schools	Centennial College	941 Progress Ave	43.7857924, -79.22780957535817	5
+Malls	Centrepoint Mall	6464 Yonge St	43.795701699999995, -79.42291271866289	4
+Attractions	Chinatown	222 Spadina Ave	43.6513658, -79.3977576	3
+Malls	Cloverdale Mall	250 The East Mall	43.63171145, -79.55536900510583	4
+Attractions	CN Tower	290 Bremner Blvd	43.6425637, -79.38708718320467	3
+Attractions	Colborne Lodge	1 Colborne Lodge Dr	43.6454052, -79.464998	5
+Libraries	College/Shaw Library	766 College St	43.65515955, -79.4201223953001	3
+Libraries	Danforth/Coxwell Library	1675 Danforth Ave	43.683624249999994, -79.32139506025445	4
+Libraries	Daniel G. Hill Library	620 Jane St	43.66544570000001, -79.49144059065506	5
+Libraries	Davenport Library	1246 Shaw St	43.6745527, -79.4284601	4
+Libraries	Dawes Road Library	416 Dawes Rd	43.7012177, -79.2972467	5
+Libraries	Deer Park Library	40 St Clair Ave E	43.68875745, -79.3924749226061	3
+Attractions	Distillery District	55 Mill St	43.6511815, -79.3575749	3
+Libraries	Don Mills Library	888 Lawrence Ave E	43.736667600000004, -79.3473522524503	6
+Libraries	Downsview Library	2793 Keele St	43.72882, -79.48204482517002	5
+Malls	Dufferin Mall	900 Dufferin St	43.65598005, -79.43572789418421	3
+Libraries	Dufferin/St. Clair Library	1625 Dufferin St	43.6769865, -79.44237735733759	4
+Malls	East York Town Centre	45 Overlea Blvd	43.70565595, -79.34613324230222	5
+Malls	Eaton Centre	220 Yonge St	43.6541457, -79.38079276646786	3
+Libraries	Eatonville Library	430 Burnhamthorpe Rd	43.6461355, -79.5590960496371	6
+Malls	Eglinton Square	70 Eglinton Square	43.7237331, -79.3003172	5
+Libraries	Elmbrook Park Library	2 Elmbrook Cres	43.6601339, -79.5838863579333	5
+Libraries	Ethennonnhawahstihnen' Library	100 Ethennonnhawahstihnen' Ln	43.7686106, -79.3753422	5
+Libraries	Evelyn Gregory Library	120 Trowell Ave	43.6863048, -79.47234542785057	5
+Malls	Fairview Mall	1800 Sheppard Ave E	43.777760799999996, -79.34429219917385	4
+Libraries	Flemingdon Park Library	29 St Dennis Dr	43.7180345, -79.3315243	5
+Libraries	Forest Hill Library	700 Eglinton Ave W	43.7023666, -79.4206252	5
+Libraries	Fort York Library	190 Fort York Blvd	43.639197499999995, -79.40034078704565	3
+Schools	George Brown College	160 Kendal Ave	43.6766548, -79.4104745	3
+Malls	Gerrard Square	1000 Gerrard St E	43.6699595, -79.3391269	3
+Libraries	Gerrard/Ashdale Library	1432 Gerrard St E	43.6724724, -79.3220909	5
+Libraries	Goldhawk Park Library	295 Alton Towers Cir	43.8241124, -79.277979	6
+Attractions	Graffiti Alley	Graffiti Alley	43.6480137, -79.3980059	3
+Attractions	High Park	200 Parkside Dr	43.6545726, -79.4599645	3
+Libraries	High Park Library	228 Roncesvalles Ave	43.64509545, -79.44896145516631	3
+Libraries	Highland Creek Library	3550 Ellesmere Rd	43.790005, -79.17519054531002	5
+Libraries	Hillcrest Library	5801 Leslie St	43.7970955, -79.3689940434389	5
+Libraries	Humber Bay Library	200 Park Lawn Rd	43.630299199999996, -79.49125076850001	6
+Schools	Humber College	205 Humber College Blvd	43.7273859, -79.6091354	4
+Libraries	Humber Summit Library	2990 Islington Ave	43.758982, -79.57157410142857	5
+Libraries	Humberwood Library	850 Humberwood Blvd	43.72888600704981, -79.6190463709445	4
+Malls	Jane-Finch Mall	1911 Finch Ave W	43.7562406, -79.51498190213127	5
+Libraries	Jane/Sheppard Library	1906 Sheppard Ave W	43.73999585, -79.5100812	6
+Libraries	Jones Library	118 Jones Ave	43.665956699999995, -79.33452153996197	4
+Malls	Kipling-Queensway Mall	1255 The Queensway	43.6211027, -79.5230583	6
+Malls	Lawrence Allen Centre	700 Lawrence Ave W	43.7167617, -79.44718952063198	3
+Libraries	Leaside Library	165 McRae Drive	43.70653595, -79.3675758989551	5
+Libraries	Lillian H. Smith Library	239 College St	43.6579433, -79.39836485602771	3
+Attractions	Little India	1426 Gerrard St E	43.672330828571425, -79.32235035714285	5
+Libraries	Locke Library	3083 Yonge St	43.7248283, -79.4018372369571	4
+Libraries	Long Branch Library	3500 Lake Shore Blvd W	43.5953161, -79.53135836465293	5
+Libraries	Main Street Library	137 Main St	43.6834165, -79.2994443	3
+Libraries	Malvern Library	30 Sewells Rd	43.8081062, -79.2158192	5
+Malls	Malvern Town Centre	31 Tapscott Rd	43.8067765, -79.22202589186507	5
+Libraries	Maria A. Shchuka Library	1745 Eglinton Ave W	43.69609905, -79.44728209367148	4
+Libraries	McGregor Park Library	2219 Lawrence Ave E	43.7478607, -79.2810908	5
+Libraries	Mimico Centennial Library	47 Station Rd	43.6147778, -79.49372154486196	5
+Attractions	Montgomery's Inn	4709 Dundas St W	43.651669999999996, -79.52569173040638	4
+Libraries	Morningside Library	4279 Lawrence Ave E	43.76986255, -79.17837645815669	5
+Libraries	Mount Dennis Library	1123 Weston Rd	43.6866092, -79.48822480106384	5
+Libraries	Mount Pleasant Library	599 Mt Pleasant Rd	43.7039289, -79.3881996	4
+Libraries	New Toronto Library	110 Eleventh St	43.599049, -79.5096039	6
+Libraries	North York Central Library	5120 Yonge St	43.7681311, -79.4147988	3
+Malls	North York Sheridan Mall	1700 Wilson Ave	43.7205731, -79.5109349	5
+Libraries	Northern District Library	40 Orchard View Blvd	43.7083798, -79.4000683	3
+Libraries	Oakwood Village Library	341 Oakwood Ave	43.6865348, -79.4381165	4
+Schools	OCAD University	100 McCaul St	43.6528622, -79.3910764	3
+Attractions	Ontario Science Centre	770 Don Mills Rd	43.714838, -79.34024290998893	5
+Libraries	Palmerston Library	560 Palmerston Ave	43.665094249999996, -79.41417067183099	3
+Libraries	Pape/Danforth Library	701 Pape Ave	43.6785829, -79.3445514	3
+Libraries	Parkdale Library	1303 Queen St W	43.64115565, -79.43263403441716	3
+Malls	Parkway Mall	85 Ellesmere Rd	43.7570385, -79.3120820920344	6
+Libraries	Parliament Street Library	269 Gerrard St E	43.66182775, -79.36794333333333	3
+Attractions	Pearson Airport	6301 Silver Dart Dr	43.68238570796763, -79.612549738938	5
+Libraries	Perth/Dupont Library	1589 Dupont St	43.665038499999994, -79.45382384869933	3
+Libraries	Pleasant View Library	575 Van Horne Ave	43.787539499999994, -79.33545137732528	5
+Attractions	Port Lands	312 Cherry St	43.64690167139649, -79.35539065414348	4
+Libraries	Port Union Library	5450 Lawrence Ave E	43.7796268, -79.1400466	6
+Libraries	Queen/Saulter Library	765 Queen St E	43.6591445, -79.34753829995947	3
+Libraries	Rexdale Library	2243 Kipling Ave	43.72612675, -79.57322762492615	6
+Libraries	Richview Library	1806 Islington Ave	43.683395250000004, -79.54112657809445	5
+Attractions	Riverdale Farm	201 Winchester St	43.666972747864165, -79.36173069096172	3
+Libraries	Riverdale Library	370 Broadview Ave	43.66578375, -79.35314409830741	3
+Libraries	Runnymede Library	2178 Bloor St W	43.651961150000005, -79.47391625410245	4
+Libraries	S. Walter Stewart Library	170 Memorial Park Ave	43.692145350000004, -79.32968063064024	5
+Libraries	Sanderson Library	327 Bathurst St	43.6521007, -79.405463	3
+Malls	Scarborough Town Centre	300 Borough Dr	43.7761341, -79.25843763592165	3
+Malls	Sherway Gardens	25 The West Mall	43.61188875, -79.55777331532131	6
+Attractions	Spadina Museum	285 Spadina Rd	43.678931, -79.408114	3
+Libraries	Spadina Road Library	10 Spadina Rd	43.667651899999996, -79.40464086080937	3
+Libraries	St. Clair/Silverthorn Library	1748 St Clair Ave W	43.6742497, -79.4605933	4
+Libraries	St. James Town Library	495 Sherbourne St	43.6673836, -79.3742632	3
+Libraries	St. Lawrence Library	171 Front Street E	43.6499639, -79.3684534	3
+Attractions	St. Lawrence Market	95 Front St E	43.6491228, -79.3718086	3
+Libraries	Steeles Library	375 Bamburgh Cir	43.8154998, -79.3221583	6
+Libraries	Swansea Memorial Library	95 Lavinia Ave	43.6476015, -79.4778706	4
+Libraries	Taylor Memorial Library	1440 Kingston Rd	43.6878105, -79.27130082710653	5
+Attractions	The Well	486 Front St W	43.64278772144382, -79.3957876281311	3
+Libraries	Thorncliffe Library	48 Thorncliffe Park Dr	43.7029518, -79.3425925	5
+Libraries	Todmorden Room Library	1081 1/2 Pape Ave	43.69179465, -79.34925849880982	5
+Schools	Toronto Metropolitan University	50 Gould St	43.6584361, -79.37921155735538	3
+Libraries	Toronto Reference Library	789 Yonge St	43.6718771, -79.38666629895212	3
+Attractions	Toronto Zoo	2000 Meadowvale Rd	43.82051696299911, -79.1806257422935	6
+Attractions	Trinity Bellwoods	155 Crawford St	43.64624295, -79.41490005351744	3
+Schools	University of Toronto Scarborough	1265 Military Trail	43.7833635, -79.1870813	5
+Schools	University of Toronto	15 King's College Cir	43.6628446, -79.39517302166654	3
+Schools	University of Toronto Schools (Humbert Campus)	30 Humbert St	43.6459433, -79.4212295975669	3
+Libraries	Victoria Village Library	184 Sloane Ave	43.736011500000004, -79.31290943201161	5
+Libraries	Weston Library	2 King St	43.701792999999995, -79.52060578567017	4
+Malls	Woodbine Mall	500 Rexdale Blvd	43.720471, -79.60056995241172	5
+Malls	Woodside Square	1571 Sandhurst Cir	43.80880420682393, -79.2696897227877	5
+Libraries	Wychwood Library	1431 Bathurst St	43.6822365, -79.41759457147383	3
+Schools	York University	94 York Blvd	43.7732062579264, -79.50291630426568	3
+Schools	York University (Glendon Campus)	2275 Bayview Ave	43.7301697, -79.3812726	6
+Libraries	York Woods Library	1785 Finch Ave W	43.7588675, -79.50732581137106	5
+Malls	Yorkdale Mall	3401 Dufferin St	43.7256238, -79.45230789320112	3
+Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.split("\n");
+
+        let libraries = [];
+        let malls = [];
+        let schools = [];
+        let attractions = [];
+        
+        for (let i = 0; i < data.length; i++) {
+            let location_string = data[i].split("\t");
+            let type = location_string[0];
+            let location = {
+                name: location_string[1],
+                address: location_string[2],
+                coordinates: location_string[3],
+                base_points: location_string[4],
+            }
+
+            if (type == "Libraries") {
+                libraries.push(location);
+            }
+            else if (type == "Malls") {
+                malls.push(location);
+            }
+            else if (type == "Schools") {
+                schools.push(location);
+            }
+            else {
+                attractions.push(location);
+            }
+        }
+
+        document.body.onload = function() {
+            if (localStorage.generated_locations != null) {
+                update_cards(JSON.parse(localStorage.generated_locations));
+            }
+        };
+
+        function generate() {
+            // todo: generate
+            let possible_arrays = [libraries, malls, schools, attractions, attractions, attractions];
+            let generated_locations = [];
+
+            for (let i = 0; i <= 2; i++) {
+                let array = possible_arrays[Math.floor(Math.random() * possible_arrays.length)];
+                let generated_location = array[Math.floor(Math.random() * array.length)];
+
+                while (generated_locations.map((x) => x.name).includes(generated_location.name)) {
+                    array = possible_arrays[Math.floor(Math.random() * possible_arrays.length)];
+                    generated_location = array[Math.floor(Math.random() * array.length)];
+                }
+
+                generated_location.points = points(generated_location.base_points, generated_location.coordinates);
+                generated_locations.push(generated_location);
+            }
+            
+            localStorage.generated_locations = JSON.stringify(generated_locations);
+            update_cards(generated_locations);
+        }
+
+        function update_cards(generated_locations) {
+            for (let i = 1; i <= 3; i++) {
+                let generated_location = generated_locations[i - 1];
+                document.getElementById("card" + i).innerHTML = `<h1>${generated_location.name}</h1><a target="_blank" href="https://www.google.com/maps/dir//${generated_location.coordinates.replace(' ', '%20')}"><b>${generated_location.address}</b></a><p>${generated_location.points} points</p>`;
+            }
+        }
+
+        function points(base_points, coordinates) {
+            var distance = distance_to(coordinates);
+
+            if (distance == 0) {
+                return 0;
+            }
+            else if (distance <= 3) {
+                return base_points;
+            }
+            else if (distance <= 6) {
+                return base_points + 1;
+            }
+            else if (distance <= 9) {
+                return base_points + 2;
+            }
+            else {
+                return base_points + 3;
+            }
+        }
+
+        function distance_to(coordinates) {
+            if (navigator.geolocation) {
+                let [lat1, lon1] = coordinates.split(" ").map(Number);
+                
+                navigator.geolocation.getCurrentPosition(position => {
+                    lat2 = position.coords.latitude;
+                    lon2 = position.coords.longitude;
+
+                    let toRad = deg => deg * Math.PI / 180;
+                    let R = 6371;
+                    let dLat = toRad(lat2 - lat1);
+                    let dLon = toRad(lon2 - lon1);
+                    let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+                    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                    let distance = R * c;
+
+                    return distance;
+                });
+            }
+            else {
+                return 0;
+            }
+        }
+    </script>
+</html>
