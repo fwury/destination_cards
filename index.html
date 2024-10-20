@@ -207,10 +207,10 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
         for (let i = 0; i < rawData.length; i++) {
             let locationInfo = rawData[i].split("\t");
             categories[locationInfo[0]].push({
-                name: [locationInfo[1],
-                address: [locationInfo[2],
-                coordinates: [locationInfo[3],
-                basepoints: [locationInfo[4]
+                name: locationInfo[1],
+                address: locationInfo[2],
+                coordinates: locationInfo[3],
+                basepoints: locationInfo[4]
             });
         }
 
