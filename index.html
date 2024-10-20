@@ -279,6 +279,8 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121	3`.
                     
                     document.getElementById(`card${i + 1}`).innerHTML = `<h1>${location.name}</h1><p><a target="blank" href="https://www.google.com/maps/dir//${location.address},%20Toronto"><b>${location.address}</b></a> - ${distance.toFixed(2)} km away</p><p>${location.points} points</p>`;
                 }
+
+                removeLoading();
             });
         }
 
