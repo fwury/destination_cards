@@ -2,17 +2,23 @@
 <html>
     <head>
         <title>Destination Cards</title>
-        <link href="https://fonts.cdnfonts.com/css/dm-sans" rel="stylesheet">
+        <link href="https://fonts.cdnfonts.com/css/dm-sans" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" integrity="sha512-6ZCLMiYwTeli2rVh3XAPxy3YoR5fVxGdH/pz+KMCzRY2M65Emgkw00Yqmhh8qLGeYQ3LbVZGdmOX9KUjSKr0TA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js" integrity="sha512-OFs3W4DIZ5ZkrDhBFtsCP6JXtMEDGmhl0QPlmWYBJay40TT1n3gt2Xuw8Pf/iezgW9CdabjkNChRqozl/YADmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
         <style>
             body {
-                margin: 0;
+                margin: 0 10vw 0;
                 padding: 0;
                 font-family: 'DM Sans', sans-serif;
                 font-size: 1.5vh;
+                overflow: hidden;
             }
 
             a {
-                color: rgb(218, 37, 29);
+                color: #da251d;
             }
 
             h1, h2, h3, h4, h5, h6, p {
@@ -20,31 +26,34 @@
                 margin-bottom: 0;
             }
 
-            #cards {
-                margin: 5vh 10vw 2.5vh;
-            }
-
             .card {
                 width: calc(80vw - 44px);
-                height: 20vh;
+                height: 15vh;
                 margin-bottom: 2.5vh;
                 padding: 20px;
-                border: 2px solid rgb(218, 37, 29);
+                border: 2px solid #da251d;
                 border-radius: 20px;
-                overflow-y: scroll;
+                overflow: scroll;
             }
 
-            #button {
+            .button {
                 width: calc(80vw - 34px);
-                margin-left: 10vw;
+                margin-top: 2.5vh;
+                margin-bottom: 2.5vh;
                 padding: 15px;
-                background-color: rgb(218, 37, 29);
-                border: 2px solid rgb(218, 37, 29);
+                background-color: #da251d;
+                border: 2px solid #da251d;
                 border-radius: 10px;
                 color: white;
                 font-weight: bold;
                 text-align: center;
                 cursor: pointer;
+            }
+
+            .inverse {
+                background-color: white;
+                border: 2px solid #da251d;
+                color: #da251d;
             }
 
             #loading {
@@ -56,20 +65,26 @@
                 background: url(loading.gif) white;
                 background-repeat: no-repeat;
                 background-size: 100px 100px;
-                background-position: 50% calc(50% - 5vh);
+                background-position: calc(50% - 10vw) 50%;
+                z-index: 9999;
+            }
+
+            #map {
+                height: 50vh;
+                border: none;
+                border-radius: 0;
             }
         </style>
     </head>
     <body>
         <div id="loading"></div>
-        <div id="cards">
-            <div id="card1" class="card"><i>Click the button to generate locations!</i></div>
-            <div id="card2" class="card"><i>Click the button to generate locations!</i></div>
-            <div id="card3" class="card"><i>Click the button to generate locations!</i></div>
-        </div>
-        <div id="button" onclick="generateLocations()">
+        <div class="button" onclick="generateLocations()">
             <h3>Generate Locations</h3>
         </div>
+        <div id="card1" class="card"><i>Click the button to generate locations!</i></div>
+        <div id="card2" class="card"><i>Click the button to generate locations!</i></div>
+        <div id="card3" class="card"><i>Click the button to generate locations!</i></div>
+        <div id="map" class="card"></div>
     </body>
     <script>
         let rawData = `Attractions	Aga Khan Museum	77 Wynford Dr	43.725301599999995, -79.3319921102314
@@ -225,6 +240,13 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
                 coordinates: locationInfo[3]
             });
         }
+
+        let markers = [];
+        let map = L.map("map").setView([43.725518, -79.390531], 10);
+        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 20,
+            attribution: "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
+        }).addTo(map);
         
         window.onload = () => {
             if (localStorage.savedLocations == null) {
@@ -238,11 +260,13 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
         function addLoading() {
             let loading = document.getElementById("loading");
             loading.style.display = "block";
+            document.body.style.overflow = "hidden";
         }
 
         function removeLoading() {
             let loading = document.getElementById("loading");
             loading.style.display = "none";
+            document.body.style.overflow = "scroll";
         }
 
         function generateLocations() {
@@ -283,12 +307,39 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
             navigator.geolocation.getCurrentPosition(position => {
                 let lat1 = position.coords.latitude;
                 let lon1 = position.coords.longitude;
+
+                map.setView([43.725518, -79.390531], 10);
+
+                for (var i = 0; i < markers.length; i++) {
+                    map.removeLayer(markers[i]);
+                }
+
+                let marker = L.circle([lat1, lon1], {
+                    color: "#1dd2da",
+                    fillColor: "#1dd2da",
+                    fillOpacity: 1,
+                    radius: 0
+                });
+
+                markers.push(marker);
+                marker.addTo(map);
                 
                 for (let i = 0; i < locations.length; i++) {
                     let location = locations[i];
                     let [lat2, lon2] = location.coordinates.split(", ").map(Number);
                     let distance = distanceBetween(lat1, lon1, lat2, lon2);
                     document.getElementById(`card${i + 1}`).innerHTML = `<h1>${location.name}</h1><p><a target="blank" href="https://www.google.com/maps/dir//${location.address},%20Toronto"><b>${location.address}</b></a> - ${distance.toFixed(2)} km away</p><p>${location.points} points</p>`;
+                    
+                    let marker = L.circle([lat2, lon2], {
+                        color: "#da251d",
+                        fillColor: "#da251d",
+                        fillOpacity: 1,
+                        radius: 0
+                    });
+
+                    marker.bindPopup(`<h3>${location.name}</h3><a target="blank" href="https://www.google.com/maps/dir//${location.address},%20Toronto"><b>${location.address}</b></a> - ${distance.toFixed(2)} km away<br />${location.points} points`);
+                    markers.push(marker);
+                    marker.addTo(map);
                 }
 
                 removeLoading();
