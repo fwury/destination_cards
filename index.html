@@ -87,6 +87,9 @@
         <div id="map" class="card"></div>
     </body>
     <script>
+        let MAP_POSITION = [43.725518, -79.390531];
+        let CITY_NAME = "Toronto";
+        
         let rawData = `Attractions	Aga Khan Museum	77 Wynford Dr	43.725301599999995, -79.3319921102314
 Libraries	Agincourt Library	155 Bonis Ave	43.785267000000005, -79.29344776239067
 Libraries	Albert Campbell Library	496 Birchmount Rd	43.7080605, -79.26929902050875
@@ -242,7 +245,7 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
         }
 
         let markers = [];
-        let map = L.map("map").setView([43.725518, -79.390531], 10);
+        let map = L.map("map").setView(MAP_POSITION, 10);
         L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
             maxZoom: 20,
             attribution: "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>"
@@ -271,36 +274,24 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
 
         function generateLocations() {
             addLoading();
+            
             let allCategories = [categories.Libraries, categories.Malls, categories.Schools, categories.Attractions];
             let selectedLocations = [];
 
-            navigator.geolocation.getCurrentPosition(position => {
-                let lat1 = position.coords.latitude;
-                let lon1 = position.coords.longitude;
+            while (selectedLocations.length < 3) {
+                let selectedLocationsNames = selectedLocations.map(loc => loc.name);
+                let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
+                let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
+                let [lat2, lon2] = randomLocation.coordinates.split(", ").map(Number);
                 
-                while (selectedLocations.length < 3) {
-                    let selectedLocationsNames = selectedLocations.map(loc => loc.name);
-                    let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
-                    let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
-                    let [lat2, lon2] = randomLocation.coordinates.split(", ").map(Number);
-                    let distance = distanceBetween(lat1, lon1, lat2, lon2);
-                    
-                    if (!selectedLocationsNames.includes(randomLocation.name) && distance >= 3) {
-                        randomLocation.points = points(distance);
-                        selectedLocations.push(randomLocation);
-                    }
+                if (!selectedLocationsNames.includes(randomLocation.name)) {
+                    randomLocation.points = points(distance);
+                    selectedLocations.push(randomLocation);
                 }
-    
-                localStorage.savedLocations = JSON.stringify(selectedLocations);
-
-                setTimeout(() => {
-                    updateCards(selectedLocations);
-                }, 0);
-            }, error => {
-                if (error.code == error.PERMISSION_DENIED) {
-                    alert("Please enable geolocation.");
-                }
-            });
+            }
+            
+            localStorage.savedLocations = JSON.stringify(selectedLocations);
+            updateCards(selectedLocations);
         }
 
         function updateCards(locations) {
@@ -308,7 +299,7 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
                 let lat1 = position.coords.latitude;
                 let lon1 = position.coords.longitude;
 
-                map.setView([43.725518, -79.390531], 10);
+                map.setView(MAP_POSITION, 10);
 
                 for (var i = 0; i < markers.length; i++) {
                     map.removeLayer(markers[i]);
@@ -337,7 +328,7 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
                         radius: 0
                     });
 
-                    marker.bindPopup(`<h3>${location.name}</h3><a target="blank" href="https://www.google.com/maps/dir//${location.address},%20Toronto"><b>${location.address}</b></a> - ${distance.toFixed(2)} km away<br />${location.points} points`);
+                    marker.bindPopup(`<h3>${location.name}</h3><a target="blank" href="https://www.google.com/maps/dir//${location.address},%20${CITY_NAME}"><b>${location.address}</b></a> - ${distance.toFixed(2)} km away<br />${location.points} points`);
                     markers.push(marker);
                     marker.addTo(map);
                 }
@@ -351,9 +342,9 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
         }
         
         function points(distance) {
-            return 3 + Math.floor(distance/3);
+            return 2 + Math.floor(distance/2);
         }
-
+        
         function distanceBetween(lat1, lon1, lat2, lon2) {
             let toRad = deg => deg * Math.PI / 180;
             let R = 6371;
