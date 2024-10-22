@@ -278,20 +278,30 @@ Libraries	Yorkville Library	22 Yorkville Ave	43.67200735, -79.38862315771121`.sp
             let allCategories = [categories.Libraries, categories.Malls, categories.Schools, categories.Attractions];
             let selectedLocations = [];
 
-            while (selectedLocations.length < 3) {
-                let selectedLocationsNames = selectedLocations.map(loc => loc.name);
-                let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
-                let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
-                let [lat2, lon2] = randomLocation.coordinates.split(", ").map(Number);
+            navigator.geolocation.getCurrentPosition(position => {
+                let lat1 = position.coords.latitude;
+                let lon1 = position.coords.longitude;
                 
-                if (!selectedLocationsNames.includes(randomLocation.name)) {
-                    randomLocation.points = points(distance);
-                    selectedLocations.push(randomLocation);
+                while (selectedLocations.length < 3) {
+                    let selectedLocationsNames = selectedLocations.map(loc => loc.name);
+                    let randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
+                    let randomLocation = randomCategory[Math.floor(Math.random() * randomCategory.length)];
+                    let [lat2, lon2] = randomLocation.coordinates.split(", ").map(Number);
+                    let distance = distanceFrom(lat1, lon1, lat2, lon2);
+                    
+                    if (!selectedLocationsNames.includes(randomLocation.name)) {
+                        randomLocation.points = points(distance);
+                        selectedLocations.push(randomLocation);
+                    }
                 }
-            }
-            
-            localStorage.savedLocations = JSON.stringify(selectedLocations);
-            updateCards(selectedLocations);
+                
+                localStorage.savedLocations = JSON.stringify(selectedLocations);
+                setTimeout(() => {updateCards(selectedLocations)}, 0);
+            }, error => {
+                if (error.code == error.PERMISSION_DENIED) {
+                    alert("Please enable geolocation.");
+                }
+            });
         }
 
         function updateCards(locations) {
